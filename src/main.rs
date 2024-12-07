@@ -16,11 +16,11 @@ fn main() {
         let encoded_sum: u32 = encoded_data.iter().map(|&x| x as u32).sum();
         
         // エンコードデータの和を追加した新しいベクターを作成
-        let mut encoded_data_next = encoded_data.clone();
-        encoded_data_next.push(encoded_sum as u16);
+        let mut coefficients_sum = coefficients.clone();
+        coefficients_sum.push(encoded_sum as u16);
         
         // エンコードデータとその和を同じ行列内に格納
-        all_encoded_data_with_sum.push(encoded_data_next.clone());
+        all_encoded_data_with_sum.push(coefficients_sum.clone());
         
         println!("Iteration {}:", i);
         println!("Original data: {:?}", data);
@@ -28,12 +28,12 @@ fn main() {
         println!("Coefficients: {:?}", coefficients);
         println!("Decoded data: {:?}", decoded_data);
         println!("Sum of encoded data: {:?}", encoded_sum);
-        println!("Encoded data with sum: {:?}", encoded_data_next);
+        println!("Coefficients with sum: {:?}", coefficients_sum);
         println!();
     }
     
     // 最後にすべてのエンコードデータとその和を表示
-    println!("All encoded data with sum: {:?}", all_encoded_data_with_sum);
+    println!("All Coefficients with sum: {:?}", all_encoded_data_with_sum);
 }
 
 fn random_network_coding(data: &Vec<u8>) -> (Vec<u16>, Vec<u16>) {
