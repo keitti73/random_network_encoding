@@ -3,26 +3,37 @@ use rand::Rng;
 fn main() {
     // サンプルデータ
     let data = vec![1, 2, 3, 4, 5];
+    let mut all_encoded_data_with_sum = Vec::new();
     
-    // 符号化されたデータを生成
-    let (encoded_data, coefficients) = random_network_coding(&data);
+    for i in 1..=5 {
+        // 符号化されたデータを生成
+        let (encoded_data, coefficients) = random_network_coding(&data);
+        
+        // 復号化されたデータを生成
+        let decoded_data = random_network_decoding(&encoded_data, &coefficients);
+        
+        // エンコードデータの和を計算
+        let encoded_sum: u32 = encoded_data.iter().map(|&x| x as u32).sum();
+        
+        // エンコードデータの和を追加した新しいベクターを作成
+        let mut encoded_data_next = encoded_data.clone();
+        encoded_data_next.push(encoded_sum as u16);
+        
+        // エンコードデータとその和を同じ行列内に格納
+        all_encoded_data_with_sum.push(encoded_data_next.clone());
+        
+        println!("Iteration {}:", i);
+        println!("Original data: {:?}", data);
+        println!("Encoded data: {:?}", encoded_data);
+        println!("Coefficients: {:?}", coefficients);
+        println!("Decoded data: {:?}", decoded_data);
+        println!("Sum of encoded data: {:?}", encoded_sum);
+        println!("Encoded data with sum: {:?}", encoded_data_next);
+        println!();
+    }
     
-    // 復号化されたデータを生成
-    let decoded_data = random_network_decoding(&encoded_data, &coefficients);
-    
-    // エンコードデータの和を計算
-    let encoded_sum: u32 = encoded_data.iter().map(|&x| x as u32).sum();
-    
-    // エンコードデータの和を追加した新しいベクターを作成
-    let mut encoded_data_next = encoded_data.clone();
-    encoded_data_next.push(encoded_sum as u16);
-    
-    println!("Original data: {:?}", data);
-    println!("Encoded data: {:?}", encoded_data);
-    println!("Coefficients: {:?}", coefficients);
-    println!("Decoded data: {:?}", decoded_data);
-    println!("Sum of encoded data: {:?}", encoded_sum);
-    println!("Encoded data with sum: {:?}", encoded_data_next);
+    // 最後にすべてのエンコードデータとその和を表示
+    println!("All encoded data with sum: {:?}", all_encoded_data_with_sum);
 }
 
 fn random_network_coding(data: &Vec<u8>) -> (Vec<u16>, Vec<u16>) {
