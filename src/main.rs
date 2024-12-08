@@ -12,7 +12,7 @@ fn main() {
         let decoded_data = random_network_decoding(&encoded_data, &coefficients);
         
         // エンコードデータの和を計算
-        let encoded_sum: i32 = encoded_data.iter().map(|&x| x as i32).sum();
+        let encoded_sum: i32 = encoded_data.iter().fold(0, |acc, &x| acc ^ x);
         
         // エンコードデータの和を追加した新しいベクターを作成
         let mut coefficients_sum = coefficients.clone();
@@ -42,6 +42,10 @@ fn main() {
             println!("解なしまたは一意解なし");
         }
     }
+
+    let solution = solve_xor_matrix(&mut all_encoded_data_with_sum);
+
+    println!("Solution: {:?}", solution);
 }
 
 fn random_network_coding(data: &Vec<i32>) -> (Vec<i32>, Vec<i32>) {
@@ -114,4 +118,51 @@ fn gaussian_elimination(matrix: &mut Vec<Vec<i32>>) -> Option<Vec<f64>> {
         // 解を取得
     }
     Some(mat.iter().map(|row| row[n]).collect())
+}
+
+fn solve_xor_matrix(matrix: &mut Vec<Vec<i32>>) -> Vec<i32> {
+    let n = matrix.len();
+    let m = matrix[0].len() - 1; // 拡大係数行列なので最後の列が右辺
+
+    let mut row = 0;
+
+    for col in 0..m {
+        // ピボットの選択
+        let mut pivot = row;
+        while pivot < n && matrix[pivot][col] == 0 {
+            pivot += 1;
+        }
+
+        if pivot == n {
+            continue;
+        }
+
+        // ピボット行を現在の行にスワップ
+        matrix.swap(row, pivot);
+
+        // 現在の行を正規化（他の行に影響しない形にする）
+        for i in 0..n {
+            if i != row && matrix[i][col] == 1 {
+                for j in col..=m {
+                    matrix[i][j] ^= matrix[row][j];
+                }
+            }
+        }
+
+        row += 1;
+    }
+
+    // 解を計算
+    let mut solution = vec![0; m];
+    for i in 0..n {
+        let mut sum = 0;
+        for j in 0..m {
+            sum ^= matrix[i][j] & solution[j];
+        }
+        if sum != matrix[i][m] {
+            solution[i] = matrix[i][m];
+        }
+    }
+
+    solution
 }
