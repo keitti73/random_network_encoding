@@ -11,7 +11,7 @@ fn main() {
         // 復号化されたデータを生成
         let decoded_data = random_network_decoding(&encoded_data, &coefficients);
         
-        // エンコー��データの和を計算
+        // エンコードデータの和を計算
         let encoded_sum: i32 = encoded_data.iter().map(|&x| x as i32).sum();
         
         // エンコードデータの和を追加した新しいベクターを作成
