@@ -34,8 +34,14 @@ fn main() {
     
     // 最後にすべてのエンコードデータとその和を表示
     println!("All Coefficients with sum: {:?}", all_encoded_data_with_sum);
-
-    row_reduction (&mut all_encoded_data_with_sum);
+    match gaussian_elimination(&mut all_encoded_data_with_sum) {
+        Some(solution) => {
+            println!("解: {:?}", solution);
+        }
+        None => {
+            println!("解なしまたは一意解なし");
+        }
+    }
 }
 
 fn random_network_coding(data: &Vec<i32>) -> (Vec<i32>, Vec<i32>) {
@@ -47,7 +53,7 @@ fn random_network_coding(data: &Vec<i32>) -> (Vec<i32>, Vec<i32>) {
         // 0から100までのランダムな係数を生成
         let coefficient: i32 = rng.gen_range(0..=100);
         // 符号化
-        encoded_data.push(value as i32 ^ coefficient);
+        encoded_data.push(value as i32 * coefficient);
         coefficients.push(coefficient);
     }
     
@@ -65,25 +71,47 @@ fn random_network_decoding(encoded_data: &Vec<i32>, coefficients: &Vec<i32>) -> 
     decoded_data
 }
 
-fn row_reduction(matrix: &mut Vec<Vec<i32>>) {
-    let rows = matrix.len();
-    let cols = matrix[0].len();
 
-    for i in 0..rows {
-        // Make the diagonal contain all 1's
-        let diag = matrix[i][i];
-        for j in 0..cols {
-            matrix[i][j] /= diag;
+fn gaussian_elimination(matrix: &mut Vec<Vec<i32>>) -> Option<Vec<f64>> {
+    let n = matrix.len();
+    let mut mat: Vec<Vec<f64>> = matrix
+        .iter()
+        .map(|row| row.iter().map(|&x| x as f64).collect())
+        .collect();
+    
+    for i in 0..n {
+            // ピボット選択（最大値で列を正規化）
+        let mut max_row = i;
+        for k in i+1..n {
+            if mat[k][i].abs() > mat[max_row][i].abs() {
+                max_row = k;
+            }
         }
-
-        // Make the other rows contain 0's in the current column
-        for k in 0..rows {
-            if k != i {
-                let factor = matrix[k][i];
-                for j in 0..cols {
-                    matrix[k][j] -= factor * matrix[i][j];
+        mat.swap(i, max_row);
+    
+            // 対角要素がゼロの場合は解が存在しない
+        if mat[i][i] == 0.0 {
+            return None;
+       }
+    
+            // ピボット行の正規化
+        for k in i+1..=n { // =nは右辺（拡張部分）も含む
+            mat[i][k] /= mat[i][i];
+        }
+        mat[i][i] = 1.0;
+    
+            // 他の行を消去
+        for j in 0..n {
+            if j != i {
+                let factor = mat[j][i];
+                for k in i..=n {
+                    mat[j][k] -= factor * mat[i][k];                    
                 }
             }
         }
+
+    
+        // 解を取得
     }
+    Some(mat.iter().map(|row| row[n]).collect())
 }
