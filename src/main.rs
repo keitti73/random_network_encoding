@@ -13,11 +13,11 @@ fn main() {
         let decoded_data = random_network_decoding(&encoded_data, &coefficients);
         
         // エンコードデータの和を計算
-        let encoded_sum: u32 = encoded_data.iter().map(|&x| x as u32).sum();
+        let encoded_sum: i32 = encoded_data.iter().map(|&x| x as i32).sum();
         
         // エンコードデータの和を追加した新しいベクターを作成
         let mut coefficients_sum = coefficients.clone();
-        coefficients_sum.push(encoded_sum as u16);
+        coefficients_sum.push(encoded_sum as i32);
         
         // エンコードデータとその和を同じ行列内に格納
         all_encoded_data_with_sum.push(coefficients_sum.clone());
@@ -34,25 +34,27 @@ fn main() {
     
     // 最後にすべてのエンコードデータとその和を表示
     println!("All Coefficients with sum: {:?}", all_encoded_data_with_sum);
+
+    row_reduction (&mut all_encoded_data_with_sum);
 }
 
-fn random_network_coding(data: &Vec<u8>) -> (Vec<u16>, Vec<u16>) {
+fn random_network_coding(data: &Vec<i32>) -> (Vec<i32>, Vec<i32>) {
     let mut rng = rand::thread_rng();
     let mut encoded_data = Vec::new();
-    let mut coefficients = Vec::new();
+    let mut coefficients:Vec<i32> = Vec::new();
     
     for &value in data.iter() {
         // 0から100までのランダムな係数を生成
-        let coefficient: u16 = rng.gen_range(0..=100);
+        let coefficient: i32 = rng.gen_range(0..=100);
         // 符号化
-        encoded_data.push(value as u16 ^ coefficient);
+        encoded_data.push(value as i32 ^ coefficient);
         coefficients.push(coefficient);
     }
     
     (encoded_data, coefficients)
 }
 
-fn random_network_decoding(encoded_data: &Vec<u16>, coefficients: &Vec<u16>) -> Vec<u16> {
+fn random_network_decoding(encoded_data: &Vec<i32>, coefficients: &Vec<i32>) -> Vec<i32> {
     let mut decoded_data = Vec::new();
     
     for (encoded_value, &coefficient) in encoded_data.iter().zip(coefficients.iter()) {
@@ -61,4 +63,27 @@ fn random_network_decoding(encoded_data: &Vec<u16>, coefficients: &Vec<u16>) -> 
     }
     
     decoded_data
+}
+
+fn row_reduction(matrix: &mut Vec<Vec<i32>>) {
+    let rows = matrix.len();
+    let cols = matrix[0].len();
+
+    for i in 0..rows {
+        // Make the diagonal contain all 1's
+        let diag = matrix[i][i];
+        for j in 0..cols {
+            matrix[i][j] /= diag;
+        }
+
+        // Make the other rows contain 0's in the current column
+        for k in 0..rows {
+            if k != i {
+                let factor = matrix[k][i];
+                for j in 0..cols {
+                    matrix[k][j] -= factor * matrix[i][j];
+                }
+            }
+        }
+    }
 }
