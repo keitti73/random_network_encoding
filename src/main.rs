@@ -1,7 +1,7 @@
 use rand::Rng;
 
 fn main() {
-    // サンプルデータ1
+    // サンプルデータ
     let data = vec![1, 2, 3, 4, 5];
     let mut all_encoded_data_with_sum = Vec::new();
     
