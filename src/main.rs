@@ -71,7 +71,6 @@ fn random_network_decoding(encoded_data: &Vec<i32>, coefficients: &Vec<i32>) -> 
     decoded_data
 }
 
-
 fn gaussian_elimination(matrix: &mut Vec<Vec<i32>>) -> Option<Vec<f64>> {
     let n = matrix.len();
     let mut mat: Vec<Vec<f64>> = matrix
@@ -80,7 +79,7 @@ fn gaussian_elimination(matrix: &mut Vec<Vec<i32>>) -> Option<Vec<f64>> {
         .collect();
     
     for i in 0..n {
-            // ピボット選択（最大値で列を正規化）
+        // ピボット選択（最大値で列を正規化）
         let mut max_row = i;
         for k in i+1..n {
             if mat[k][i].abs() > mat[max_row][i].abs() {
@@ -89,18 +88,18 @@ fn gaussian_elimination(matrix: &mut Vec<Vec<i32>>) -> Option<Vec<f64>> {
         }
         mat.swap(i, max_row);
     
-            // 対角要素がゼロの場合は解が存在しない
+        // 対角要素がゼロの場合は解が存在しない
         if mat[i][i] == 0.0 {
             return None;
-       }
+        }
     
-            // ピボット行の正規化
+        // ピボット行の正規化
         for k in i+1..=n { // =nは右辺（拡張部分）も含む
             mat[i][k] /= mat[i][i];
         }
         mat[i][i] = 1.0;
     
-            // 他の行を消去
+        // 他の行を消去
         for j in 0..n {
             if j != i {
                 let factor = mat[j][i];
@@ -109,9 +108,7 @@ fn gaussian_elimination(matrix: &mut Vec<Vec<i32>>) -> Option<Vec<f64>> {
                 }
             }
         }
-
-    
-        // 解を取得
     }
+    // 解を取得
     Some(mat.iter().map(|row| row[n]).collect())
 }
